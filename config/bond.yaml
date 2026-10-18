@@ -1,0 +1,11 @@
+# Filled in by D at the end of week 1. Placeholder values only.
+bond_name: TBD
+region:
+  lat_min: null
+  lat_max: null
+  lon_min: null
+  lon_max: null
+term_years: null
+principal_loss_steps:   # magnitude threshold -> fraction of principal lost
+  - {min_magnitude: null, loss_fraction: null}
+spread: null            # annual, as a fraction
