@@ -1,11 +1,107 @@
-# Filled in by D at the end of week 1. Placeholder values only.
-bond_name: TBD
-region:
-  lat_min: null
-  lat_max: null
-  lon_min: null
-  lon_max: null
-term_years: null
-principal_loss_steps:   # magnitude threshold -> fraction of principal lost
-  - {min_magnitude: null, loss_fraction: null}
-spread: null            # annual, as a fraction
+# Bond specification for the cat bond project.
+# Owner: role D. Used by role A (download region) and role C (trigger in the Monte Carlo engine).
+#
+# Each value has a tag:
+#   [public]      from a source in the "sources" list at the end of this file
+#   [derived]     calculated from public values
+#   [assumption]  our choice; change it only after the team agrees
+# All probabilities and margins are per year, as fractions (0.0117 = 1.17%).
+
+bond:
+  name: IBRD CAR Mexico 2024                       # [public]
+  issuer: World Bank (IBRD)                        # [public]
+  sponsor: Government of Mexico                    # [public]
+  settlement_date: 2024-04-17                      # [public] press release
+  maturity_date: 2028-04-24                        # [public] press release
+  term_years: 4                                    # [derived] April 2024 to April 2028
+  trigger_type: parametric                         # [public] magnitude, depth and location only
+  coverage: per_occurrence                         # [public] each earthquake is tested on its own
+  calculation_agent: AIR Worldwide (Verisk)        # [public] also made the published risk values
+  coupon: "SOFR + 0.22% funding margin + risk margin"  # [public] we price the risk margin only
+
+classes:
+  A:
+    note_series: CAR 132                           # [public]
+    principal_usd: 225000000                       # [public]
+    risk_margin: 0.040                             # [public] the spread
+    published_risk:                                # [public] AIR values; our model must match these
+      attachment_probability: 0.0117               # probability of any payout in one year
+      exhaustion_probability: 0.0048               # probability of a 100% loss in one year
+      expected_loss: 0.0090                        # mean loss per year
+  B:
+    note_series: CAR 133                           # [public]
+    principal_usd: 70000000                        # [public]
+    risk_margin: 0.110                             # [public]
+    published_risk:                                # [public]
+      attachment_probability: 0.0830
+      exhaustion_probability: 0.0376
+      expected_loss: 0.0584
+
+# Known trigger values. The full grid is not public; these are the only fixed points.
+known_thresholds:
+  - box: offshore box, near the M7.3 earthquake of 2026-07-17 (58 km WSW of Puerto Madero)  # [public] Artemis
+    lat: null                                      # role A: fill from the USGS record of that earthquake
+    lon: null
+    class_A_min_magnitude: 7.9                     # [public] first payout of class A in this box
+    class_B_min_magnitude: 7.4                     # [public] class B pays 25% at M7.4
+    class_B_first_payout: 0.25                     # [public]
+
+# Real earthquakes to test the trigger after calibration.
+validation_events:
+  - name: Offshore Chiapas, 2026-07-17             # [public]
+    magnitude: 7.3
+    expected_payout: {A: 0.0, B: 0.0}              # [public] near-miss, no payout
+  - name: Chiapas, 2017-09-08 UTC (7 Sept local)   # [public]
+    magnitude: 8.1                                 # value used at the time; check the current USGS value
+    expected_payout: large                         # [assumption] the 2017 bond paid 100%; its grid was different, so this is a rough check only
+
+# Payout rule: share of principal lost when a box threshold is passed.
+# delta_magnitude = earthquake magnitude minus the box threshold.
+# The two sources do not agree. Run both and show the difference in the report.
+payout:
+  rule_in_use: steps_artemis                       # [assumption] first version
+  steps_artemis:                                   # [public] steps of 25/50/75/100% (Artemis)
+    - {delta_magnitude: 0.0, loss_fraction: 0.25}
+    - {delta_magnitude: 0.1, loss_fraction: 0.50}  # [assumption] 0.1 spacing, from the 2017 bond (M8.0 -> 50%, M8.1 -> 100%)
+    - {delta_magnitude: 0.2, loss_fraction: 0.75}
+    - {delta_magnitude: 0.3, loss_fraction: 1.00}
+  linear_world_bank:                               # [public] shape "30% to 70%, then 70% to 100%" (World Bank)
+    - {delta_magnitude: 0.0, loss_fraction: 0.30}  # [assumption] break points; linear between them
+    - {delta_magnitude: 0.3, loss_fraction: 0.70}
+    - {delta_magnitude: 0.5, loss_fraction: 1.00}
+  max_total_loss: 1.0                              # [public] losses over the term cannot pass 100% of principal
+
+# Our replacement for the grid that is not public.
+grid:
+  cell_size_deg: 1.0                               # [assumption]
+  trigger_depth_max_km: 100                        # [assumption] real depth limit not public; also test 70 and 200
+  threshold_rule: one threshold per class for all cells   # [assumption] first version; later versions can vary by cell
+
+# How role C sets the unknown thresholds.
+calibration:
+  method: change the class threshold until the modelled attachment_probability equals the published value   # [assumption]
+  independent_checks: [exhaustion_probability, expected_loss, known_thresholds, validation_events]
+
+# Data download for role A. Wider than the trigger area; filter later.
+region:                                            # [assumption] Mexico, its sea areas and its borders
+  lat_min: 12.0
+  lat_max: 33.0
+  lon_min: -118.0
+  lon_max: -86.0
+  depth_max_km: 300
+catalog:
+  source: USGS ComCat (https://earthquake.usgs.gov/fdsnws/event/1/)
+  magnitude_type: Mw where available               # [assumption]
+  start_year: 1900                                 # [assumption] role A sets the complete period
+  min_magnitude_download: 4.5                      # [assumption] role A finds the completeness magnitude
+
+simulation:                                        # [assumption] settings for role C
+  n_years: 200000                                  # about 2% relative error on the class A attachment probability
+  random_seed: 20261115
+
+sources:
+  - https://www.worldbank.org/en/news/press-release/2024/04/17/world-bank-issues-420-million-in-catastrophe-bonds-for-renewed-disaster-risk-protection-for-mexico
+  - https://thedocs.worldbank.org/en/doc/8f7222d60ec54d0b6571131b754319c1-0340012025/original/Case-Study-Mexico-2024-Cat-Bond.pdf
+  - https://www.artemis.bm/deal-directory/ibrd-car-mexico-2024/
+  - https://www.artemis.bm/news/near-miss-for-mexicos-parametric-catastrophe-bond-on-fridays-m7-3-earthquake/
+  - https://www.artemis.bm/news/2017/09/08/mexico-m8-1-earthquake-puts-fonden-2017-catastrophe-bond-at-risk/
