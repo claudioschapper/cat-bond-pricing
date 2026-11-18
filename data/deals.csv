@@ -1,0 +1,11 @@
+bond,class,year,sponsor,region,trigger_type,size_usd_m,expected_loss_pct,attachment_prob_pct,exhaustion_prob_pct,spread_pct,risk_multiple,source_url,note
+IBRD CAR Mexico 2024,A (CAR 132),2024,Government of Mexico,Mexico,parametric,225,0.9,1.17,0.48,4.0,4.44,https://www.artemis.bm/deal-directory/ibrd-car-mexico-2024/,Selected bond. Matures 2028-04-24. Exhaustion probability from World Bank case study
+IBRD CAR Mexico 2024,B (CAR 133),2024,Government of Mexico,Mexico,parametric,70,5.84,8.3,3.76,11.0,1.88,https://www.artemis.bm/deal-directory/ibrd-car-mexico-2024/,Selected bond. July 2026 M7.3 quake was a near miss (needs M7.4 in that box)
+IBRD Chile 2023,single class,2023,Republic of Chile,Chile,parametric,350,1.0,1.48,,4.75,4.75,https://www.artemis.bm/deal-directory/ibrd-chile-2023,EL and attachment are the initial modelled values; payouts of 30/70/100%
+Acorn Re 2026-1,Class A,2026,Hannover Rueck SE / Oak Tree Assurance,US West Coast,parametric,450,0.78,0.96,,2.0,2.56,https://www.artemis.bm/deal-directory/acorn-re-ltd-series-2026-1/,EL and attachment are initial values from the $200m launch; 25% minimum payout; role D check: sponsor is Hannover Rueck
+IBRD CAR 123-124 Philippines,Class A (CAR 123),2019,Republic of the Philippines,Philippines,modelled loss,75,3.0,5.3,,5.5,1.83,https://www.artemis.bm/deal-directory/ibrd-car-123-124/,"Trigger is modelled loss, not purely parametric; year to be confirmed on the Artemis page"
+IBRD CAR 116,Chile,2018,Republic of Chile,Chile,parametric,500,0.86,1.35,,2.5,2.91,https://www.artemis.bm/deal-directory/ibrd-car-116/,Part of the Pacific Alliance bond; 30/70/100% payouts
+IBRD CAR 117,Colombia,2018,Republic of Colombia,Colombia,parametric,400,1.56,2.78,,3.0,1.92,https://www.artemis.bm/deal-directory/ibrd-car-117/,Part of the Pacific Alliance bond; 25/50/100% payouts
+IBRD CAR 118,Mexico A,2018,Government of Mexico (FONDEN),Mexico,parametric,160,0.79,1.09,,2.5,3.16,https://www.artemis.bm/deal-directory/ibrd-car-118-119,50% or 100% payouts
+IBRD CAR 119,Mexico B,2018,Government of Mexico (FONDEN),Mexico,parametric,100,6.54,8.25,,8.25,1.26,https://www.artemis.bm/deal-directory/ibrd-car-118-119,50% or 100% payouts
+IBRD CAR 120,Peru,2018,Republic of Peru,Peru,parametric,200,5.0,7.14,,6.0,1.2,https://www.artemis.bm/deal-directory/ibrd-car-120/,Paid 30% ($60m) after the M8.0 quake of 2019-05-26
